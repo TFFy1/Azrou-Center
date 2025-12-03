@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="azrou.app.ui.reports.ReportController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    
+    <Label text="Reports">
+        <font>
+            <Font size="24.0" />
+        </font>
+    </Label>
+    
+    <VBox spacing="10.0" style="-fx-border-color: #ccc; -fx-border-radius: 5; -fx-padding: 15;">
+        <Label text="Group List Report">
+            <font>
+                <Font name="System Bold" size="14.0" />
+            </font>
+        </Label>
+        <Label text="Select a group to generate a student list PDF." />
+        <ComboBox fx:id="groupCombo" prefWidth="200.0" promptText="Select Group" />
+        <Button fx:id="generateGroupReportButton" onAction="#handleGenerateGroupReport" text="Generate PDF" />
+    </VBox>
+    
+    <Separator />
+    
+    <Label fx:id="statusLabel" textFill="#27ae60" />
+</VBox>

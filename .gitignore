@@ -1,0 +1,15 @@
+.gradle/
+build/
+out/
+bin/
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.DS_Store
+*.log
+azrou_center.db
+photos/
+backups/
+exports/
