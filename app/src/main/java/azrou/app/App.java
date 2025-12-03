@@ -1,25 +1,18 @@
 package azrou.app;
 
-import azrou.app.config.DatabaseManager;
-import azrou.app.repo.AdminRepository;
-import azrou.app.service.AuthService;
-import azrou.app.repo.AbsenceRepository;
-import azrou.app.repo.AssessmentRepository;
-import azrou.app.repo.GradeRepository;
-import azrou.app.repo.GroupRepository;
-import azrou.app.repo.StudentRepository;
-import azrou.app.repo.SubjectRepository;
+import azrou.app.db.DatabaseManager;
 import azrou.app.service.AbsenceService;
 import azrou.app.service.AssessmentService;
+import azrou.app.service.AuthService;
 import azrou.app.service.BackupService;
 import azrou.app.service.CsvImportService;
-import azrou.app.service.ReportService;
 import azrou.app.service.GradeService;
 import azrou.app.service.GroupService;
+import azrou.app.service.ReportService;
+import azrou.app.service.ServiceLocator;
 import azrou.app.service.StorageService;
 import azrou.app.service.StudentService;
 import azrou.app.service.SubjectService;
-import azrou.app.service.ServiceLocator;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -36,8 +29,11 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         logger.info("Starting Azrou Center App...");
 
+        // Initialize Directories
+        azrou.app.config.AppConfig.initializeDirectories();
+
         // Initialize Database
-        DatabaseManager.initialize();
+        DatabaseManager.getInstance().initialize();
 
         // Initialize Services
         initializeServices();
@@ -60,48 +56,43 @@ public class App extends Application {
     }
 
     private void initializeServices() {
-        AdminRepository adminRepo = new AdminRepository();
-        AuthService authService = new AuthService(adminRepo);
+        // AdminRepository adminRepo = new AdminRepository(); // TODO: Implement
+        // AdminDAO if needed
+        AuthService authService = new AuthService(); // Updated constructor
 
         // Create default admin if needed
         authService.createInitialAdminIfNotExists();
 
         ServiceLocator.getInstance().register(AuthService.class, authService);
 
-        GroupRepository groupRepo = new GroupRepository();
-        GroupService groupService = new GroupService(groupRepo);
+        GroupService groupService = new GroupService();
         ServiceLocator.getInstance().register(GroupService.class, groupService);
 
         StorageService storageService = new StorageService();
         ServiceLocator.getInstance().register(StorageService.class, storageService);
 
-        StudentRepository studentRepo = new StudentRepository();
-        StudentService studentService = new StudentService(studentRepo, groupRepo, storageService);
+        StudentService studentService = new StudentService(storageService);
         ServiceLocator.getInstance().register(StudentService.class, studentService);
 
-        SubjectRepository subjectRepo = new SubjectRepository();
-        SubjectService subjectService = new SubjectService(subjectRepo, groupRepo);
+        SubjectService subjectService = new SubjectService();
         ServiceLocator.getInstance().register(SubjectService.class, subjectService);
 
-        AssessmentRepository assessmentRepo = new AssessmentRepository();
-        AssessmentService assessmentService = new AssessmentService(assessmentRepo, subjectRepo);
+        AssessmentService assessmentService = new AssessmentService();
         ServiceLocator.getInstance().register(AssessmentService.class, assessmentService);
 
-        GradeRepository gradeRepo = new GradeRepository();
-        GradeService gradeService = new GradeService(gradeRepo, studentRepo, assessmentRepo);
+        GradeService gradeService = new GradeService();
         ServiceLocator.getInstance().register(GradeService.class, gradeService);
 
-        AbsenceRepository absenceRepo = new AbsenceRepository();
-        AbsenceService absenceService = new AbsenceService(absenceRepo, studentRepo, subjectRepo);
+        AbsenceService absenceService = new AbsenceService();
         ServiceLocator.getInstance().register(AbsenceService.class, absenceService);
 
-        CsvImportService csvImportService = new CsvImportService(studentRepo, groupRepo);
+        CsvImportService csvImportService = new CsvImportService();
         ServiceLocator.getInstance().register(CsvImportService.class, csvImportService);
 
         BackupService backupService = new BackupService();
         ServiceLocator.getInstance().register(BackupService.class, backupService);
 
-        ReportService reportService = new ReportService(studentRepo, groupRepo);
+        ReportService reportService = new ReportService();
         ServiceLocator.getInstance().register(ReportService.class, reportService);
     }
 }

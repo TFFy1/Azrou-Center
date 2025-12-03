@@ -1,19 +1,10 @@
 package azrou.app.model.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "admins")
 public class Admin extends BaseEntity {
-    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "full_name")
     private String fullName;
 
     public String getUsername() {

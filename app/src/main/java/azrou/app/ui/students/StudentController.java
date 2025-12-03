@@ -1,5 +1,6 @@
 package azrou.app.ui.students;
 
+import azrou.app.config.AppConfig;
 import azrou.app.i18n.I18n;
 import azrou.app.model.dto.GroupDto;
 import azrou.app.model.dto.StudentDto;
@@ -171,11 +172,22 @@ public class StudentController {
 
         // Load photo if exists
         if (student.photoPath() != null) {
-            // In a real app, we would load from the file system
-            // For now, let's just clear the placeholder or show a default
-            // We need a way to resolve the absolute path from the relative path in DTO
-            // But UI shouldn't know about storage details ideally.
-            // For now, skip actual image loading to avoid complexity without JavaFX running
+            try {
+                File file = AppConfig.PHOTOS_THUMBNAILS_DIR.resolve(student.photoPath()).toFile();
+                if (file.exists()) {
+                    photoView.setImage(new Image(file.toURI().toString()));
+                } else {
+                    // Try original if thumbnail missing
+                    file = AppConfig.PHOTOS_ORIGINALS_DIR.resolve(student.photoPath()).toFile();
+                    if (file.exists()) {
+                        photoView.setImage(new Image(file.toURI().toString()));
+                    } else {
+                        photoView.setImage(null);
+                    }
+                }
+            } catch (Exception e) {
+                photoView.setImage(null);
+            }
         } else {
             photoView.setImage(null);
         }

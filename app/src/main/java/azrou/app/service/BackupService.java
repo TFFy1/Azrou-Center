@@ -33,7 +33,7 @@ public class BackupService {
         // (SQLite WAL mode might help or hinder).
         // A safer way is to shutdown the DB manager first.
 
-        azrou.app.config.DatabaseManager.shutdown();
+        azrou.app.db.DatabaseManager.getInstance().shutdown();
 
         Files.copy(source.toPath(), AppConfig.DB_PATH, StandardCopyOption.REPLACE_EXISTING);
         logger.info("Database restored from {}", source.getAbsolutePath());

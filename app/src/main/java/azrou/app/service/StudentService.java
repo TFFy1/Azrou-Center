@@ -1,10 +1,10 @@
 package azrou.app.service;
 
+import azrou.app.dao.GroupDAO;
+import azrou.app.dao.StudentDAO;
 import azrou.app.model.dto.StudentDto;
 import azrou.app.model.entity.Group;
 import azrou.app.model.entity.Student;
-import azrou.app.repo.GroupRepository;
-import azrou.app.repo.StudentRepository;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -16,25 +16,24 @@ import org.slf4j.LoggerFactory;
 
 public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
-    private final StudentRepository studentRepository;
-    private final GroupRepository groupRepository;
+    private final StudentDAO studentDAO;
+    private final GroupDAO groupDAO;
     private final StorageService storageService;
 
-    public StudentService(StudentRepository studentRepository, GroupRepository groupRepository,
-            StorageService storageService) {
-        this.studentRepository = studentRepository;
-        this.groupRepository = groupRepository;
+    public StudentService(StorageService storageService) {
+        this.studentDAO = new StudentDAO();
+        this.groupDAO = new GroupDAO();
         this.storageService = storageService;
     }
 
     public List<StudentDto> getStudentsByGroup(Integer groupId) {
-        return studentRepository.findByGroupId(groupId).stream()
+        return studentDAO.findByGroupId(groupId).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     public List<StudentDto> getAllStudents() {
-        return studentRepository.findAll().stream()
+        return studentDAO.findAll().stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
@@ -42,11 +41,11 @@ public class StudentService {
     public StudentDto createStudent(Integer groupId, String fullName, String cin, String qualifications,
             LocalDate dateOfBirth, String phone, File photoFile) throws IOException {
 
-        if (studentRepository.findByCin(cin).isPresent()) {
+        if (studentDAO.findByCin(cin).isPresent()) {
             throw new IllegalArgumentException("Student with CIN " + cin + " already exists.");
         }
 
-        Group group = groupRepository.findById(groupId)
+        Group group = groupDAO.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("Group not found with ID: " + groupId));
 
         Student student = new Student();
@@ -62,7 +61,7 @@ public class StudentService {
             student.setPhotoPath(photoPath);
         }
 
-        studentRepository.save(student);
+        studentDAO.save(student);
         logger.info("Created student: {}", cin);
         return toDto(student);
     }
@@ -70,16 +69,16 @@ public class StudentService {
     public void updateStudent(Integer id, Integer groupId, String fullName, String cin, String qualifications,
             LocalDate dateOfBirth, String phone, File photoFile) throws IOException {
 
-        Student student = studentRepository.findById(id)
+        Student student = studentDAO.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found with ID: " + id));
 
         // Check CIN uniqueness if changed
-        if (!student.getCin().equals(cin) && studentRepository.findByCin(cin).isPresent()) {
+        if (!student.getCin().equals(cin) && studentDAO.findByCin(cin).isPresent()) {
             throw new IllegalArgumentException("Student with CIN " + cin + " already exists.");
         }
 
         if (!student.getGroup().getId().equals(groupId)) {
-            Group group = groupRepository.findById(groupId)
+            Group group = groupDAO.findById(groupId)
                     .orElseThrow(() -> new IllegalArgumentException("Group not found with ID: " + groupId));
             student.setGroup(group);
         }
@@ -97,19 +96,19 @@ public class StudentService {
             student.setPhotoPath(photoPath);
         }
 
-        studentRepository.update(student);
+        studentDAO.update(student);
         logger.info("Updated student: {}", cin);
     }
 
     public void deleteStudent(Integer id) {
-        Optional<Student> studentOpt = studentRepository.findById(id);
+        Optional<Student> studentOpt = studentDAO.findById(id);
         if (studentOpt.isPresent()) {
             Student student = studentOpt.get();
             // Move photo to recycle bin
             if (student.getPhotoPath() != null) {
                 storageService.deletePhoto(student.getPhotoPath());
             }
-            studentRepository.delete(student);
+            studentDAO.delete(id);
             logger.info("Deleted student with ID: {}", id);
         }
     }

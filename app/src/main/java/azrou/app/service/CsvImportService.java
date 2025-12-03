@@ -1,9 +1,9 @@
 package azrou.app.service;
 
+import azrou.app.dao.GroupDAO;
+import azrou.app.dao.StudentDAO;
 import azrou.app.model.entity.Group;
 import azrou.app.model.entity.Student;
-import azrou.app.repo.GroupRepository;
-import azrou.app.repo.StudentRepository;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -12,18 +12,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CsvImportService {
     private static final Logger logger = LoggerFactory.getLogger(CsvImportService.class);
-    private final StudentRepository studentRepository;
-    private final GroupRepository groupRepository;
+    private final StudentDAO studentDAO;
+    private final GroupDAO groupDAO;
 
-    public CsvImportService(StudentRepository studentRepository, GroupRepository groupRepository) {
-        this.studentRepository = studentRepository;
-        this.groupRepository = groupRepository;
+    public CsvImportService() {
+        this.studentDAO = new StudentDAO();
+        this.groupDAO = new GroupDAO();
     }
 
     public ImportResult importStudents(File csvFile) {
@@ -58,18 +57,18 @@ public class CsvImportService {
                     }
 
                     // Check if student exists
-                    if (studentRepository.findByCin(cin).isPresent()) {
+                    if (studentDAO.findByCin(cin).isPresent()) {
                         result.addSkipped("Line " + lineNumber + ": Student with CIN " + cin + " already exists");
                         continue;
                     }
 
                     // Find or create group
-                    Group group = groupRepository.findByName(groupName).orElseGet(() -> {
+                    Group group = groupDAO.findByName(groupName).orElseGet(() -> {
                         Group newGroup = new Group();
                         newGroup.setName(groupName);
                         newGroup.setDescription("Imported from CSV");
                         newGroup.setCapacity(30); // Default
-                        groupRepository.save(newGroup);
+                        groupDAO.save(newGroup);
                         result.addCreatedGroup(groupName);
                         return newGroup;
                     });
@@ -89,7 +88,7 @@ public class CsvImportService {
                         }
                     }
 
-                    studentRepository.save(student);
+                    studentDAO.save(student);
                     result.incrementImported();
 
                 } catch (Exception e) {

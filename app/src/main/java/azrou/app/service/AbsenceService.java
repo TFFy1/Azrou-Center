@@ -1,12 +1,12 @@
 package azrou.app.service;
 
+import azrou.app.dao.AbsenceDAO;
+import azrou.app.dao.StudentDAO;
+import azrou.app.dao.SubjectDAO;
 import azrou.app.model.dto.AbsenceDto;
 import azrou.app.model.entity.Absence;
 import azrou.app.model.entity.Student;
 import azrou.app.model.entity.Subject;
-import azrou.app.repo.AbsenceRepository;
-import azrou.app.repo.StudentRepository;
-import azrou.app.repo.SubjectRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -16,30 +16,48 @@ import org.slf4j.LoggerFactory;
 
 public class AbsenceService {
         private static final Logger logger = LoggerFactory.getLogger(AbsenceService.class);
-        private final AbsenceRepository absenceRepository;
-        private final StudentRepository studentRepository;
-        private final SubjectRepository subjectRepository;
+        private final AbsenceDAO absenceDAO;
+        private final StudentDAO studentDAO;
+        private final SubjectDAO subjectDAO;
 
-        public AbsenceService(AbsenceRepository absenceRepository, StudentRepository studentRepository,
-                        SubjectRepository subjectRepository) {
-                this.absenceRepository = absenceRepository;
-                this.studentRepository = studentRepository;
-                this.subjectRepository = subjectRepository;
+        public AbsenceService() {
+                this.absenceDAO = new AbsenceDAO();
+                this.studentDAO = new StudentDAO();
+                this.subjectDAO = new SubjectDAO();
         }
 
         public List<AbsenceDto> getAbsencesByGroup(Integer groupId) {
-                return absenceRepository.findByGroupId(groupId).stream()
+                // AbsenceDAO does not have findByGroupId, but we can filter or add it.
+                // Or we can get students by group and then absences for each student.
+                // Let's assume we need to add findByGroupId to AbsenceDAO or use a custom
+                // query.
+                // For now, let's use a workaround or add it to DAO.
+                // I'll add findByGroupId to AbsenceDAO in a separate step or just use what I
+                // have.
+                // Wait, I implemented findByStudentId.
+                // I can get all students in group, then all absences for those students.
+                // Or better, add findByGroupId to AbsenceDAO.
+                // For now, I'll comment this out or fix it.
+                // Actually, the original code used absenceRepository.findByGroupId(groupId).
+                // I should add findByGroupId to AbsenceDAO.
+                return absenceDAO.findByGroupId(groupId).stream()
+                                .map(this::toDto)
+                                .collect(Collectors.toList());
+        }
+
+        public List<AbsenceDto> getAbsencesBySubject(Integer subjectId) {
+                return absenceDAO.findBySubjectId(subjectId).stream()
                                 .map(this::toDto)
                                 .collect(Collectors.toList());
         }
 
         public AbsenceDto createAbsence(Integer studentId, Integer subjectId, LocalDate date, boolean justified,
                         String reason) {
-                Student student = studentRepository.findById(studentId)
+                Student student = studentDAO.findById(studentId)
                                 .orElseThrow(() -> new IllegalArgumentException(
                                                 "Student not found with ID: " + studentId));
 
-                Subject subject = subjectRepository.findById(subjectId)
+                Subject subject = subjectDAO.findById(subjectId)
                                 .orElseThrow(() -> new IllegalArgumentException(
                                                 "Subject not found with ID: " + subjectId));
 
@@ -50,25 +68,25 @@ public class AbsenceService {
                 absence.setJustified(justified);
                 absence.setReason(reason);
 
-                absenceRepository.save(absence);
+                absenceDAO.save(absence);
                 logger.info("Created absence for student {} on {}", student.getFullName(), date);
                 return toDto(absence);
         }
 
         public void updateAbsence(Integer id, Integer studentId, Integer subjectId, LocalDate date, boolean justified,
                         String reason) {
-                Absence absence = absenceRepository.findById(id)
+                Absence absence = absenceDAO.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("Absence not found with ID: " + id));
 
                 if (!absence.getStudent().getId().equals(studentId)) {
-                        Student student = studentRepository.findById(studentId)
+                        Student student = studentDAO.findById(studentId)
                                         .orElseThrow(() -> new IllegalArgumentException(
                                                         "Student not found with ID: " + studentId));
                         absence.setStudent(student);
                 }
 
                 if (!absence.getSubject().getId().equals(subjectId)) {
-                        Subject subject = subjectRepository.findById(subjectId)
+                        Subject subject = subjectDAO.findById(subjectId)
                                         .orElseThrow(() -> new IllegalArgumentException(
                                                         "Subject not found with ID: " + subjectId));
                         absence.setSubject(subject);
@@ -78,14 +96,14 @@ public class AbsenceService {
                 absence.setJustified(justified);
                 absence.setReason(reason);
 
-                absenceRepository.update(absence);
+                absenceDAO.update(absence);
                 logger.info("Updated absence ID: {}", id);
         }
 
         public void deleteAbsence(Integer id) {
-                Optional<Absence> absenceOpt = absenceRepository.findById(id);
+                Optional<Absence> absenceOpt = absenceDAO.findById(id);
                 if (absenceOpt.isPresent()) {
-                        absenceRepository.delete(absenceOpt.get());
+                        absenceDAO.delete(id);
                         logger.info("Deleted absence ID: {}", id);
                 }
         }

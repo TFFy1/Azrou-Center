@@ -77,20 +77,27 @@ public class AssessmentController {
 
     @FXML
     public void initialize() {
-        setupTable();
-        setupCombos();
-        loadData();
-        setupBindings();
+        try {
+            setupTable();
+            setupCombos();
+            setupBindings();
 
-        assessmentsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                selectAssessment(newVal);
-            }
-        });
+            // Defer data loading
+            javafx.application.Platform.runLater(this::loadData);
 
-        subjectFilterCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            loadAssessments(newVal);
-        });
+            assessmentsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    selectAssessment(newVal);
+                }
+            });
+
+            subjectFilterCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                loadAssessments(newVal);
+            });
+        } catch (Exception e) {
+            showError("Error initializing Assessment view: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void setupTable() {
@@ -232,7 +239,7 @@ public class AssessmentController {
                 loadAssessments(subjectFilterCombo.getValue());
                 handleClear();
             } catch (Exception e) {
-                showError(e.getMessage());
+                showError("Error deleting assessment", e);
             }
         }
     }
@@ -255,7 +262,22 @@ public class AssessmentController {
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(I18n.get("common.error"));
+        alert.setHeaderText("Error");
         alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showError(String context, Throwable e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(I18n.get("common.error"));
+        alert.setHeaderText(context);
+
+        String msg = e.getMessage();
+        if (e.getCause() != null) {
+            msg += "\nCaused by: " + e.getCause().getMessage();
+        }
+
+        alert.setContentText(msg);
         alert.showAndWait();
     }
 }

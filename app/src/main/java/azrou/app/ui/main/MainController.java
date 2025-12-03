@@ -22,6 +22,8 @@ public class MainController {
     @FXML
     private Button groupsButton;
     @FXML
+    private Button subjectsButton;
+    @FXML
     private Button assessmentsButton;
     @FXML
     private Button gradesButton;
@@ -56,12 +58,13 @@ public class MainController {
                 switch (event.getCode()) {
                     case DIGIT1 -> showStudents();
                     case DIGIT2 -> showGroups();
-                    case DIGIT3 -> showAssessments();
-                    case DIGIT4 -> showGrades();
-                    case DIGIT5 -> showAbsences();
-                    case DIGIT6 -> showImport();
-                    case DIGIT7 -> showBackup();
-                    case DIGIT8 -> showReports();
+                    case DIGIT3 -> showSubjects();
+                    case DIGIT4 -> showAssessments();
+                    case DIGIT5 -> showGrades();
+                    case DIGIT6 -> showAbsences();
+                    case DIGIT7 -> showImport();
+                    case DIGIT8 -> showBackup();
+                    case DIGIT9 -> showReports();
                     default -> {
                     }
                 }
@@ -72,6 +75,7 @@ public class MainController {
     private void bindI18n() {
         studentsButton.textProperty().bind(I18n.createStringBinding("menu.students"));
         groupsButton.textProperty().bind(I18n.createStringBinding("menu.groups"));
+        subjectsButton.textProperty().bind(I18n.createStringBinding("menu.subjects"));
         // Add other bindings as keys become available
         assessmentsButton.setText("Assessments");
         gradesButton.setText("Grades");
@@ -84,7 +88,7 @@ public class MainController {
 
     @FXML
     private void showStudents() {
-        loadView("/azrou/app/ui/students/students.fxml");
+        loadView("/azrou/app/ui/students/student.fxml");
     }
 
     @FXML
@@ -93,13 +97,18 @@ public class MainController {
     }
 
     @FXML
+    private void showSubjects() {
+        loadView("/azrou/app/ui/subjects/subject.fxml");
+    }
+
+    @FXML
     private void showAssessments() {
-        loadView("/azrou/app/ui/assessments/assessments.fxml");
+        loadView("/azrou/app/ui/assessments/assessment.fxml");
     }
 
     @FXML
     private void showGrades() {
-        loadView("/azrou/app/ui/grades/grades.fxml");
+        loadView("/azrou/app/ui/grades/grade.fxml");
     }
 
     @FXML

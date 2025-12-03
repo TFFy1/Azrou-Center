@@ -1,10 +1,10 @@
 package azrou.app.service;
 
 import azrou.app.config.AppConfig;
+import azrou.app.dao.GroupDAO;
+import azrou.app.dao.StudentDAO;
 import azrou.app.model.dto.GroupDto;
 import azrou.app.model.dto.StudentDto;
-import azrou.app.repo.GroupRepository;
-import azrou.app.repo.StudentRepository;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -21,20 +21,20 @@ import org.slf4j.LoggerFactory;
 
 public class ReportService {
     private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
-    private final StudentRepository studentRepository;
-    private final GroupRepository groupRepository;
+    private final StudentDAO studentDAO;
+    private final GroupDAO groupDAO;
 
-    public ReportService(StudentRepository studentRepository, GroupRepository groupRepository) {
-        this.studentRepository = studentRepository;
-        this.groupRepository = groupRepository;
+    public ReportService() {
+        this.studentDAO = new StudentDAO();
+        this.groupDAO = new GroupDAO();
     }
 
     public File generateGroupListReport(Integer groupId) throws IOException {
-        GroupDto group = groupRepository.findById(groupId)
+        GroupDto group = groupDAO.findById(groupId)
                 .map(g -> new GroupDto(g.getId(), g.getName(), g.getDescription(), g.getCapacity(), g.getCreatedAt()))
                 .orElseThrow(() -> new IllegalArgumentException("Group not found: " + groupId));
 
-        List<StudentDto> students = studentRepository.findByGroupId(groupId).stream()
+        List<StudentDto> students = studentDAO.findByGroupId(groupId).stream()
                 .map(s -> new StudentDto(s.getId(), s.getGroup().getId(), s.getGroup().getName(),
                         s.getFullName(), s.getCin(), s.getQualifications(), s.getDateOfBirth(), s.getPhone(),
                         s.getPhotoPath(), s.getCreatedAt()))
@@ -65,7 +65,6 @@ public class ReportService {
                 // Table Header
                 float yPosition = 700;
                 float margin = 50;
-                float yStart = yPosition;
                 float bottomMargin = 70;
                 float tableWidth = page.getMediaBox().getWidth() - 2 * margin;
                 float rowHeight = 20;

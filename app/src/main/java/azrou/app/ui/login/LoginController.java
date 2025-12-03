@@ -86,16 +86,6 @@ public class LoginController {
             }
         });
 
-        I18n.localeProperty().addListener((obs, o, n) -> updateTexts());
-        updateTexts();
-    }
-
-    private void updateTexts() {
-        titleLabel.setText(I18n.get("login.title"));
-        usernameLabel.setText(I18n.get("login.username"));
-        passwordLabel.setText(I18n.get("login.password"));
-        loginButton.setText(I18n.get("login.button"));
-        forgotPasswordLabel.setText(I18n.get("login.forgot_password"));
     }
 
     private void handleLogin() {

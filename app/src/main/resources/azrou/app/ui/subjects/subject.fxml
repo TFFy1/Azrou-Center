@@ -49,6 +49,7 @@
             <TextField fx:id="codeField" />
             
             <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                <Button fx:id="manageButton" text="Manage Details" onAction="#handleManage" disable="true" />
                 <Button fx:id="clearButton" text="Clear" onAction="#handleClear" />
                 <Button fx:id="deleteButton" text="Delete" onAction="#handleDelete" style="-fx-background-color: #ffcccc;" />
                 <Button fx:id="updateButton" text="Update" onAction="#handleUpdate" />

@@ -4,9 +4,7 @@ module azrou.app {
     requires java.sql;
     requires org.slf4j;
     requires ch.qos.logback.classic;
-    requires jakarta.persistence;
-    requires org.hibernate.orm.core;
-    requires com.zaxxer.hikari;
+
     requires jbcrypt;
     requires net.coobird.thumbnailator;
     requires org.apache.pdfbox;
@@ -24,7 +22,6 @@ module azrou.app {
     opens azrou.app.ui.main to javafx.fxml;
     opens azrou.app.ui.backup to javafx.fxml;
     opens azrou.app.ui.reports to javafx.fxml;
-    opens azrou.app.model.entity to org.hibernate.orm.core;
 
     exports azrou.app;
 }

@@ -19,6 +19,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import java.io.IOException;
 import javafx.util.StringConverter;
 
 public class SubjectController {
@@ -50,6 +56,8 @@ public class SubjectController {
     private Button deleteButton;
     @FXML
     private Button clearButton;
+    @FXML
+    private Button manageButton;
 
     private final SubjectService subjectService;
     private final GroupService groupService;
@@ -65,20 +73,27 @@ public class SubjectController {
 
     @FXML
     public void initialize() {
-        setupTable();
-        setupCombos();
-        loadData();
-        setupBindings();
+        try {
+            setupTable();
+            setupCombos();
+            setupBindings();
 
-        subjectsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                selectSubject(newVal);
-            }
-        });
+            // Defer data loading to ensure UI is ready and to catch DB errors safely
+            javafx.application.Platform.runLater(this::loadData);
 
-        groupFilterCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            loadSubjects(newVal);
-        });
+            subjectsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                if (newVal != null) {
+                    selectSubject(newVal);
+                }
+            });
+
+            groupFilterCombo.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                loadSubjects(newVal);
+            });
+        } catch (Exception e) {
+            showError("Error initializing Subject view", e);
+            e.printStackTrace();
+        }
     }
 
     private void setupTable() {
@@ -148,6 +163,7 @@ public class SubjectController {
         addButton.setDisable(true);
         updateButton.setDisable(false);
         deleteButton.setDisable(false);
+        manageButton.setDisable(false);
     }
 
     @FXML
@@ -165,7 +181,7 @@ public class SubjectController {
             loadSubjects(groupFilterCombo.getValue());
             handleClear();
         } catch (Exception e) {
-            showError(e.getMessage());
+            showError("Error creating subject", e);
         }
     }
 
@@ -187,7 +203,7 @@ public class SubjectController {
             loadSubjects(groupFilterCombo.getValue());
             handleClear();
         } catch (Exception e) {
-            showError(e.getMessage());
+            showError("Error updating subject", e);
         }
     }
 
@@ -207,8 +223,29 @@ public class SubjectController {
                 loadSubjects(groupFilterCombo.getValue());
                 handleClear();
             } catch (Exception e) {
-                showError(e.getMessage());
+                showError("Error deleting subject", e);
             }
+        }
+    }
+
+    @FXML
+    private void handleManage() {
+        if (selectedSubject == null)
+            return;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/azrou/app/ui/subjects/subject_details.fxml"));
+            Parent root = loader.load();
+
+            SubjectDetailsController controller = loader.getController();
+            controller.setSubject(selectedSubject);
+
+            Stage stage = new Stage();
+            stage.setTitle("Subject Details: " + selectedSubject.name());
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+        } catch (IOException e) {
+            showError("Failed to open details view", e);
         }
     }
 
@@ -223,12 +260,35 @@ public class SubjectController {
         addButton.setDisable(false);
         updateButton.setDisable(true);
         deleteButton.setDisable(true);
+        manageButton.setDisable(true);
     }
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(I18n.get("common.error"));
+        alert.setHeaderText("Error");
+
+        // Unpack the cause if available to show the real SQL error
+        if (message.contains("Error") || message.contains("Exception")) {
+            // This is a bit hacky, but we want to see the underlying error
+            // The caller usually passes e.getMessage() which might be the wrapper
+        }
+
         alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showError(String context, Throwable e) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(I18n.get("common.error"));
+        alert.setHeaderText(context);
+
+        String msg = e.getMessage();
+        if (e.getCause() != null) {
+            msg += "\nCaused by: " + e.getCause().getMessage();
+        }
+
+        alert.setContentText(msg);
         alert.showAndWait();
     }
 }
