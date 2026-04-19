@@ -19,12 +19,7 @@ public class DatabaseManager {
     }
 
     private DatabaseManager() {
-        try {
-            // Ensure driver is loaded
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException e) {
-            throw new DataAccessException("SQLite JDBC Driver not found", e);
-        }
+        // Modern JDBC drivers auto-register themselves
     }
 
     public static synchronized DatabaseManager getInstance() {
@@ -36,13 +31,7 @@ public class DatabaseManager {
 
     public Connection getConnection() {
         try {
-            Connection conn = DriverManager.getConnection(DB_URL);
-            // Enforce foreign keys and WAL mode for reliability
-            try (Statement stmt = conn.createStatement()) {
-                stmt.execute("PRAGMA foreign_keys = ON;");
-                stmt.execute("PRAGMA journal_mode = WAL;");
-            }
-            return conn;
+            return DriverManager.getConnection(DB_URL, AppConfig.DB_USER, AppConfig.DB_PASSWORD);
         } catch (SQLException e) {
             logger.error("Failed to establish database connection", e);
             throw new DataAccessException("Could not connect to database", e);
@@ -54,7 +43,7 @@ public class DatabaseManager {
         String[] schema = {
                 """
                         CREATE TABLE IF NOT EXISTS groups (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            id SERIAL PRIMARY KEY,
                             name TEXT NOT NULL UNIQUE,
                             description TEXT,
                             capacity INTEGER NOT NULL DEFAULT 25,
@@ -63,7 +52,7 @@ public class DatabaseManager {
                         """,
                 """
                         CREATE TABLE IF NOT EXISTS students (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            id SERIAL PRIMARY KEY,
                             group_id INTEGER NOT NULL,
                             full_name TEXT NOT NULL,
                             cin TEXT UNIQUE NOT NULL,
@@ -77,7 +66,7 @@ public class DatabaseManager {
                         """,
                 """
                         CREATE TABLE IF NOT EXISTS subjects (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            id SERIAL PRIMARY KEY,
                             group_id INTEGER NOT NULL,
                             name TEXT NOT NULL,
                             code TEXT,
@@ -88,7 +77,7 @@ public class DatabaseManager {
                         """,
                 """
                         CREATE TABLE IF NOT EXISTS assessments (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            id SERIAL PRIMARY KEY,
                             subject_id INTEGER NOT NULL,
                             name TEXT NOT NULL,
                             date DATE,
@@ -100,7 +89,7 @@ public class DatabaseManager {
                         """,
                 """
                         CREATE TABLE IF NOT EXISTS grades (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            id SERIAL PRIMARY KEY,
                             student_id INTEGER NOT NULL,
                             assessment_id INTEGER NOT NULL,
                             score REAL,
@@ -113,7 +102,7 @@ public class DatabaseManager {
                         """,
                 """
                         CREATE TABLE IF NOT EXISTS admins (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            id SERIAL PRIMARY KEY,
                             username TEXT NOT NULL UNIQUE,
                             password_hash TEXT NOT NULL,
                             full_name TEXT,
@@ -122,11 +111,11 @@ public class DatabaseManager {
                         """,
                 """
                         CREATE TABLE IF NOT EXISTS absences (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            id SERIAL PRIMARY KEY,
                             student_id INTEGER NOT NULL,
                             subject_id INTEGER NOT NULL,
                             date DATE NOT NULL,
-                            justified BOOLEAN NOT NULL DEFAULT 0,
+                            justified BOOLEAN NOT NULL DEFAULT false,
                             reason TEXT,
                             recorded_by INTEGER,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

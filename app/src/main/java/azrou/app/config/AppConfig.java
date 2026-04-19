@@ -21,8 +21,9 @@ public class AppConfig {
     public static final Path EXPORTS_DIR = APP_DIR.resolve("exports");
     public static final Path LOGS_DIR = APP_DIR.resolve("logs");
 
-    public static final Path DB_PATH = DATA_DIR.resolve("azrou_center.db");
-    public static final String DB_URL = "jdbc:sqlite:" + DB_PATH.toAbsolutePath().toString().replace("\\", "/");
+    public static final String DB_URL = "jdbc:postgresql://localhost:5432/azrou_center";
+    public static final String DB_USER = "postgres";
+    public static final String DB_PASSWORD = "postgres";
 
     public static void initializeDirectories() {
         try {
