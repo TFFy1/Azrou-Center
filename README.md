@@ -40,11 +40,24 @@ This application is built tightly around a **PostgreSQL** relational database sy
 - **Standard JDBC Connection:** Uses standard JDBC driver connection logic (`org.postgresql:postgresql`) without an abstracted ORM, demonstrating raw proficiency of SQL queries and prepared statements.
 - **ACID Compliant:** Transactions are utilized manually for schema initialization to ensure atomic reliability. 
 
-### Database Setup
-To run this application locally without NetBeans, ensure you have a PostgreSQL server running on your machine.
-1. Install PostgreSQL and ensure it is running on standard port `5432`.
-2. Create a database named `azrou_center`. (The default username and password in config is `postgres`/`postgres`).
-3. The schema will be automatically initialized when the application is first run.
+### Database Setup & Mock Data Injection
+To run this application, every teammate must configure their own local PostgreSQL server and inject the unified mock data.
+
+1. **Install PostgreSQL** on your local machine and make sure a server is running on the standard port `5432`.
+2. **Create the Database:** Open your PostgreSQL tool (like pgAdmin or the `psql` console) and cleanly run:
+   ```sql
+   CREATE DATABASE azrou_center;
+   ```
+3. **Change Your Credentials:** Your local PostgreSQL database password is specific to *your* hardware installation. Before running the app, open `app/src/main/java/azrou/app/config/AppConfig.java` in your code editor and forcefully update the variables to match your personal database password:
+   ```java
+   public static final String DB_USER = "postgres"; // Almost always postgres by default
+   public static final String DB_PASSWORD = "your_actual_password_here";
+   ```
+4. **Load the Mock Data:** A `mock_data.sql` file is included in our project featuring exactly 5 Groups, 15 Teachers, 30 Subjects, and 150 Students cleanly bound by PostgreSQL Foreign Keys. To pull this data into your newly configured database, open Command Prompt or PowerShell, navigate securely to the project's root folder, and execute:
+   ```bash
+   psql -U postgres -d azrou_center -f mock_data.sql
+   ```
+   *(When the script says `INSERT 0 1` successfully at the bottom, hit **Run** in NetBeans! The Java app will dynamically pull all 150 generated records instantly.)*
 
 ---
 

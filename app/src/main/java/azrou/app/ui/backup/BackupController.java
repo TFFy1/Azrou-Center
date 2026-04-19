@@ -28,7 +28,7 @@ public class BackupController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Backup");
         fileChooser.setInitialFileName(backupService.generateDefaultBackupFile().getName());
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("SQLite Database", "*.db"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PostgreSQL Backup", "*.backup"));
 
         File file = fileChooser.showSaveDialog(statusLabel.getScene().getWindow());
         if (file != null) {
@@ -51,7 +51,7 @@ public class BackupController {
         if (confirm.showAndWait().orElse(null) == javafx.scene.control.ButtonType.OK) {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select Backup File");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("SQLite Database", "*.db"));
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PostgreSQL Backup", "*.backup"));
 
             File file = fileChooser.showOpenDialog(statusLabel.getScene().getWindow());
             if (file != null) {

@@ -51,6 +51,15 @@ public class DatabaseManager {
                         );
                         """,
                 """
+                        CREATE TABLE IF NOT EXISTS teachers (
+                            id SERIAL PRIMARY KEY,
+                            full_name TEXT NOT NULL,
+                            email TEXT UNIQUE,
+                            phone TEXT,
+                            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        );
+                        """,
+                """
                         CREATE TABLE IF NOT EXISTS students (
                             id SERIAL PRIMARY KEY,
                             group_id INTEGER NOT NULL,
@@ -68,10 +77,12 @@ public class DatabaseManager {
                         CREATE TABLE IF NOT EXISTS subjects (
                             id SERIAL PRIMARY KEY,
                             group_id INTEGER NOT NULL,
+                            teacher_id INTEGER,
                             name TEXT NOT NULL,
                             code TEXT,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
+                            FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE SET NULL,
                             UNIQUE(group_id, name)
                         );
                         """,

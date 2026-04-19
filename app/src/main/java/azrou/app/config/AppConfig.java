@@ -23,7 +23,7 @@ public class AppConfig {
 
     public static final String DB_URL = "jdbc:postgresql://localhost:5432/azrou_center";
     public static final String DB_USER = "postgres";
-    public static final String DB_PASSWORD = "postgres";
+    public static final String DB_PASSWORD = "admin";
 
     public static void initializeDirectories() {
         try {
