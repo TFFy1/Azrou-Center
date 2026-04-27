@@ -26,6 +26,7 @@
             <Button fx:id="studentsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showStudents" text="Students" />
             <Button fx:id="groupsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showGroups" text="Groups" />
             <Button fx:id="subjectsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showSubjects" text="Subjects" />
+            <Button fx:id="teachersButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showTeachers" text="Teachers" />
             <Separator prefWidth="200.0" />
             <Button fx:id="assessmentsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showAssessments" text="Assessments" />
             <Button fx:id="gradesButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showGrades" text="Grades" />

@@ -22,6 +22,7 @@ module azrou.app {
     opens azrou.app.ui.main to javafx.fxml;
     opens azrou.app.ui.backup to javafx.fxml;
     opens azrou.app.ui.reports to javafx.fxml;
+    opens azrou.app.ui.teachers to javafx.fxml;
 
     exports azrou.app;
 }

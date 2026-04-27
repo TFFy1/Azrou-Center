@@ -13,6 +13,7 @@ import azrou.app.service.ServiceLocator;
 import azrou.app.service.StorageService;
 import azrou.app.service.StudentService;
 import azrou.app.service.SubjectService;
+import azrou.app.service.TeacherService;
 import java.io.IOException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -76,6 +77,10 @@ public class App extends Application {
 
         SubjectService subjectService = new SubjectService();
         ServiceLocator.getInstance().register(SubjectService.class, subjectService);
+
+        TeacherService teacherService = new TeacherService();
+        ServiceLocator.getInstance().register(TeacherService.class, teacherService);
+
 
         AssessmentService assessmentService = new AssessmentService();
         ServiceLocator.getInstance().register(AssessmentService.class, assessmentService);

@@ -24,6 +24,8 @@ public class MainController {
     @FXML
     private Button subjectsButton;
     @FXML
+    private Button teachersButton;
+    @FXML
     private Button assessmentsButton;
     @FXML
     private Button gradesButton;
@@ -76,6 +78,7 @@ public class MainController {
         studentsButton.textProperty().bind(I18n.createStringBinding("menu.students"));
         groupsButton.textProperty().bind(I18n.createStringBinding("menu.groups"));
         subjectsButton.textProperty().bind(I18n.createStringBinding("menu.subjects"));
+        teachersButton.textProperty().bind(I18n.createStringBinding("menu.teachers"));
         // Add other bindings as keys become available
         assessmentsButton.setText("Assessments");
         gradesButton.setText("Grades");
@@ -99,6 +102,11 @@ public class MainController {
     @FXML
     private void showSubjects() {
         loadView("/azrou/app/ui/subjects/subject.fxml");
+    }
+
+    @FXML
+    private void showTeachers() {
+        loadView("/azrou/app/ui/teachers/teacher.fxml");
     }
 
     @FXML
