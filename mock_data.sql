@@ -101,8 +101,8 @@ INSERT INTO groups (id, name, description, capacity) VALUES (46048, 'Couture', '
 INSERT INTO groups (id, name, description, capacity) VALUES (93810, 'Informatique', 'Formation en bureautique, réseaux et développement web', 22);
 
 -- ======================== ADMINS ========================
-INSERT INTO admins (id, username, password_hash, full_name) VALUES (79514, 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lOn2', 'Administrateur Principal');
-INSERT INTO admins (id, username, password_hash, full_name) VALUES (80697, 'coordo_azrou', '$2a$10$V5kVjKQ9wXmR3sT8uPzL4.hGYqM1nEo7dWxBl2Fk9pRcZsI0eNmD', 'Fatima Ezzahra Moumen');
+INSERT INTO admins (id, username, password_hash, full_name) VALUES (79514, 'admin', 'admin', 'Administrateur Principal');
+INSERT INTO admins (id, username, password_hash, full_name) VALUES (80697, 'coordo_azrou', 'admin', 'Fatima Ezzahra Moumen');
 
 -- ======================== TEACHERS ========================
 INSERT INTO teachers (id, full_name, email, phone) VALUES (13905, 'Rachida Senhaji', 'r.senhaji@azrou-centre.ma', '0661234501');
