@@ -3,7 +3,6 @@ package azrou.app.service;
 import azrou.app.dao.AdminDAO;
 import azrou.app.model.entity.Admin;
 import java.util.Optional;
-import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,10 +16,10 @@ public class AuthService {
     }
 
     public boolean login(String username, String password) {
-        Optional<Admin> adminOpt = adminDAO.findByUsername(username);
+        Optional<Admin> adminOpt = adminDAO.findByUsernameAndPassword(username, password);
         if (adminOpt.isPresent()) {
             Admin admin = adminOpt.get();
-            if (BCrypt.checkpw(password, admin.getPasswordHash())) {
+            if (password.equals(admin.getPasswordHash())) {
                 currentUser = admin;
                 logger.info("User logged in: {}", username);
                 return true;
@@ -46,7 +45,7 @@ public class AuthService {
             logger.info("No admins found. Creating default admin.");
             Admin admin = new Admin();
             admin.setUsername("admin");
-            admin.setPasswordHash(BCrypt.hashpw("admin", BCrypt.gensalt()));
+            admin.setPasswordHash("admin");
             admin.setFullName("Administrator");
             adminDAO.save(admin);
         }

@@ -31,11 +31,12 @@ public class AdminDAO implements GenericDAO<Admin, Integer> {
         return Optional.empty();
     }
 
-    public Optional<Admin> findByUsername(String username) {
-        String sql = "SELECT * FROM admins WHERE username = ?";
+    public Optional<Admin> findByUsernameAndPassword(String username, String password) {
+        String sql = "SELECT * FROM admins WHERE username = ? AND password_hash = ?";
         try (Connection conn = DatabaseManager.getInstance().getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, username);
+            pstmt.setString(2, password);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(mapResultSetToEntity(rs));
